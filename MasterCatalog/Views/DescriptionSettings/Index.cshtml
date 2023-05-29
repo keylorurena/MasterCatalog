@@ -1,0 +1,210 @@
+﻿@{
+    ViewBag.Title = "Description Settings";
+}
+<!-- Custom styles for this page -->
+<link href="~/Content/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link href="~/Content/vendor/datatables-responsive/css/responsive.bootstrap4.min.css" rel="stylesheet">
+<!-- Page level plugins -->
+<script src="~/Content/vendor/datatables/jquery.dataTables.js"></script>
+<script src="~/Content/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="~/Content/vendor/datatables-responsive/js/dataTables.responsive.min.js"></script>
+
+<h1 class="h3 mb-0 text-gray-800">Description Settings Manager</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header d-flex flex-row align-items-center justify-content-between">
+        <h6 class="d-none d-sm-block m-0 font-weight-bold text-primary">List of Descriptions Setting</h6>
+        <div class="card-tools">
+            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#settingModal">
+                <i class="fas fa-plus fa-sm"></i>
+                Setting
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="">
+            <table id="settingsDataTable" class="table table-bordered" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Drink Type</th>
+                        <th>Description Type</th>
+                        <th>Rule</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Drink Type</th>
+                        <th>Description Type</th>
+                        <th>Rule</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="settingModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingModalTitle">Create Settings</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <input id="settingID" hidden />
+                    <div class="form-group col-12 col-sm-6">
+                        <label for="settingDrinkType">Drink Type:</label>
+                        <select class="custom-select" id="settingDrinkType">
+                            <option selected disabled value="">Choose...</option>
+                            <option value="Beer">Beer</option>
+                            <option value="Juice">Juice</option>
+                            <option value="Soda">Soda</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-12 col-sm-6">
+                        <label for="settingDescriptionType">Description Type:</label>
+                        <select class="custom-select" id="settingDescriptionType">
+                            <option selected disabled value="">Choose...</option>
+                            <option value="1">Description</option>
+                            <option value="2">Extended Description</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="settingRule">Rule</label>
+                        <input type="text" class="form-control" id="settingRule" placeholder="$[...]">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" onclick="ClearForm()"><i class="fas fa-trash fa-sm"></i> New</button>
+                <button class="btn btn-success" type="button" onclick="OnClickBtnSaveSettings()"><i class="fas fa-save fa-sm"></i> Save</button>
+                <button class="btn btn-danger" type="button" data-dismiss="modal"><i class="fas fa-times fa-sm"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var urls = {
+        getSettings: "@Url.Action("GetAll", "DescriptionSettings")",
+        saveSettings: "@Url.Action("Save", "DescriptionSettings")"
+    }
+    var elements = {
+        elementsID: {
+            settingsDataTable: 'settingsDataTable'
+        },
+        elementsObject: {
+            settingsDataTable: null
+        },
+        elementsData: {
+            settings: []
+        }
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        InitSettingsDataTable();
+        GetInitialData();
+    });
+
+    function InitSettingsDataTable() {
+        elements.elementsObject.settingsDataTable = $(`#${elements.elementsID.settingsDataTable}`).DataTable({
+            responsive: true,
+            autoWidth: false,
+            data: elements.elementsData.settings,
+            columns: [
+                { data: 'DrinkType' },
+                {
+                    data: 'DescriptionType', render: function (data, type, row) {
+                        if (type === 'display') {
+                            return data === 1 ? 'Description' : 'Extender Description'
+                        }
+                        return '';
+                    }
+                },
+                { data: 'Rule' },
+                {
+                    data: 'ID', render: function (data, type, row) {
+                        if (type === 'display') {
+                            return `<button class="btn btn-primary" type="button" onClick="OnClickBtnEditSetting(${data})">
+                                        <i class="fas fa-edit fa-sm"></i>
+                                    </button>`
+                        }
+                        return '';
+                    }
+                }
+            ]
+        });
+    }
+
+    function GetInitialData() {
+        GetDataSettings();
+    }
+
+    function GetDataSettings() {
+        $.get(urls.getSettings, function (data) {
+            console.log(data);
+
+            if (data.Result) {
+                elements.elementsObject.settingsDataTable.clear();
+                elements.elementsObject.settingsDataTable.rows.add(data.Result);
+                elements.elementsObject.settingsDataTable.draw();
+                elements.elementsData.settings = data.Result;
+                elements.elementsObject.settingsDataTable.columns.adjust();
+                elements.elementsObject.settingsDataTable.responsive.recalc();
+            } else {
+                toastr.error(data.Message);
+            }
+        }).fail(function () {
+            toastr.error("Error getting data");
+        });
+    }
+
+    function GetSettingsObject() {
+        return {
+            ID: $("#settingID").val(),
+            DrinkType: $("#settingDrinkType").val(),
+            DescriptionType: $("#settingDescriptionType").val(),
+            Rule: $("#settingRule").val()
+        };
+    }
+
+    function ClearForm() {
+        $("#settingID").val(0);
+        $("#settingDrinkType").val('');
+        $("#settingDescriptionType").val('');
+        $("#settingRule").val('');
+        $("#settingModalTitle").html("Create Setting")
+    }
+
+    function OnClickBtnEditSetting(settingID) {
+        var setting = elements.elementsData.settings.find(s => s.ID === settingID);
+        $("#settingID").val(setting.ID);
+        $("#settingDrinkType").val(setting.DrinkType);
+        $("#settingDescriptionType").val(setting.DescriptionType);
+        $("#settingRule").val(setting.Rule);
+        $("#settingModalTitle").html("Edit Setting");
+        $('#settingModal').modal('toggle')
+    }
+
+    function OnClickBtnSaveSettings() {
+        var objSettings = GetSettingsObject();
+
+        $.post(urls.saveSettings, objSettings).done(function (data) {
+            if (data.Status) {
+                toastr.success(data.Result);
+                GetDataSettings();
+            } else {
+                toastr.error(data.Message);
+            }
+        }).fail(function () {
+            toastr.error("Error getting data");
+        });
+    }
+</script>

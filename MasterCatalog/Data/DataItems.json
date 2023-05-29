@@ -1,0 +1,50 @@
+{
+  "CurrentScope": 1,
+  "Data": [
+    {
+      "ID": 1,
+      "ItemLookupCode": "B001",
+      "Name": "Budweiser",
+      "IsCarbonated": true,
+      "IsCarbonatedString": "Carbonated",
+      "SubDescription1": "Sub Desc 1",
+      "SubDescription2": "Sub Desc 2",
+      "SubDescription3": "Sub Desc 3",
+      "Content": "330ml",
+      "AlcoholPercent": 5.0,
+      "DrinkType": "Beer",
+      "Description": "Heineken, Carbonated",
+      "ExtendedDescription": "Heineken, Carbonated"
+    },
+    {
+      "ID": 2,
+      "ItemLookupCode": "J001",
+      "Name": "Orange Juice",
+      "IsCarbonated": false,
+      "IsCarbonatedString": "Not Carbonated",
+      "SubDescription1": "Sub Desc 1",
+      "SubDescription2": "Sub Desc 2",
+      "SubDescription3": "Sub Desc 3",
+      "Content": "250ml",
+      "FruitMade": "Oranges",
+      "DrinkType": "Juice",
+      "Description": "Orange Juice, Not Carbonated",
+      "ExtendedDescription": "Orange Juice, Not Carbonated"
+    },
+    {
+      "ID": 3,
+      "ItemLookupCode": "S001",
+      "Name": "Pepsi",
+      "IsCarbonated": true,
+      "IsCarbonatedString": "Carbonated",
+      "SubDescription1": "Sub Desc 1",
+      "SubDescription2": "Sub Desc 2",
+      "SubDescription3": "Sub Desc 3",
+      "Content": "600ml",
+      "Flavor": "Cola",
+      "DrinkType": "Soda",
+      "Description": "Pepsi, Carbonated",
+      "ExtendedDescription": "Pepsi, Carbonated"
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+﻿
+@{
+    ViewBag.Title = "Items";
+}
+<!-- Custom styles for this page -->
+<link href="~/Content/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link href="~/Content/vendor/datatables-responsive/css/responsive.bootstrap4.min.css" rel="stylesheet">
+<!-- Page level plugins -->
+<script src="~/Content/vendor/datatables/jquery.dataTables.js"></script>
+<script src="~/Content/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="~/Content/vendor/datatables-responsive/js/dataTables.responsive.min.js"></script>
+
+<h1 class="h3 mb-0 text-gray-800">Item Manager</h1>
+<p class="mb-4">
+    You can customize the product description by accessing the <a href="~/DescriptionSettings">Description Settings</a> page.
+</p>
+
+<div class="card shadow mb-4">
+    <div class="card-header d-flex flex-row align-items-center justify-content-between">
+        <h6 class="d-none d-sm-block m-0 font-weight-bold text-primary">List of Items</h6>
+        <div class="card-tools">
+            <button class="btn btn-primary" type="button">
+                <i class="fas fa-plus fa-sm"></i>
+                Add Item
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="">
+            <table id="itemsDataTable" class="table table-bordered" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>IsCarbonated</th>
+                        <th>DrinkType</th>
+                        <th>Description</th>
+                        <th>Extended Description</th>
+                        <th>Content</th>
+                        <th>SubDescription 1</th>
+                        <th>SubDescription 2</th>
+                        <th>SubDescription 3</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>IsCarbonated</th>
+                        <th>DrinkType</th>
+                        <th>Description</th>
+                        <th>Extended Description</th>
+                        <th>Content</th>
+                        <th>SubDescription 1</th>
+                        <th>SubDescription 2</th>
+                        <th>SubDescription 3</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    var urls = {
+        getItems: "@Url.Action("GetAll", "Item")"
+    }
+    var elements = {
+        elementsID: {
+            itemsDataTable: 'itemsDataTable'
+        },
+        elementsObject: {
+            itemsDataTable: null
+        },
+        elementsData: {
+            items: []
+        }
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        InitItemDataTable();
+        GetInitialData();
+    });
+
+    function InitItemDataTable() {
+        elements.elementsObject.itemsDataTable = $(`#${elements.elementsID.itemsDataTable}`).DataTable({
+            responsive: true,
+            autoWidth: false,
+            data: elements.elementsData.items,
+            columns: [
+                { data: 'ItemLookupCode' },
+                { data: 'Name' },
+                { data: 'IsCarbonatedString' },
+                { data: 'DrinkType' },
+                { data: 'Description' },
+                { data: 'ExtendedDescription' },
+                { data: 'Content' },
+                { data: 'SubDescription1' },
+                { data: 'SubDescription2' },
+                { data: 'SubDescription3' },
+                {
+                    data: 'ID', render: function (data, type, row) {
+                        if (type === 'display') {
+                            return `<button class="btn btn-primary" type="button" onClick="OnClickBtnEditItem(${data})">
+                                        <i class="fas fa-edit fa-sm"></i>
+                                    </button>`
+                        }
+                        return '';
+                    }
+                }
+            ]
+        });
+    }
+
+    function GetInitialData() {
+        GetDataItems();
+    }
+
+    function GetDataItems() {
+        $.get(urls.getItems, function (data) {
+            console.log(data);
+
+            if (data.Result) {
+                elements.elementsObject.itemsDataTable.clear();
+                elements.elementsObject.itemsDataTable.rows.add(data.Result);
+                elements.elementsObject.itemsDataTable.draw();
+                elements.elementsData.items = data.Result;
+                elements.elementsObject.itemsDataTable.columns.adjust();
+                elements.elementsObject.itemsDataTable.responsive.recalc();
+            } else {
+                toastr.error(data.Message);
+            }
+        }).fail(function () {
+            toastr.error("Error getting data");
+        });
+    }
+
+    function OnClickBtnEditItem(itemID) {
+        alert(itemID);
+    }
+</script>
